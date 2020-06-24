@@ -29,9 +29,12 @@ public class Server {
 				clientSocket = serverSocket.accept();
 				clientIP = clientSocket.getRemoteSocketAddress().toString();
 				InputStream serverInputStream = clientSocket.getInputStream();
+				InputStreamReader in = new InputStreamReader(serverInputStream);
+				BufferedReader bufferedReader = new BufferedReader(in);
 				OutputStream serverOutputStream = clientSocket.getOutputStream();
+				PrintWriter writer = new PrintWriter(serverOutputStream);
 				System.out.println("Connection from address " + clientIP);
-				ThreadedClient clientThread = new ThreadedClient(clientSocket, serverInputStream, serverOutputStream, clientList);
+				ThreadedClient clientThread = new ThreadedClient(clientSocket, bufferedReader, writer, clientList);
 				clientList.add(clientThread);
 				clientThread.start();
 			}
@@ -48,31 +51,28 @@ public class Server {
 	public class ThreadedClient extends Thread {
 
 		Socket socket;
-		InputStream reader;
-		OutputStream outputStream;
+		BufferedReader reader;
 		PrintWriter writer;
 		ArrayList<ThreadedClient> clientList;
 
-		public ThreadedClient(Socket socket, InputStream input, OutputStream outputStream, ArrayList<ThreadedClient> clientList) {
+		public ThreadedClient(Socket socket, BufferedReader reader, PrintWriter writer, ArrayList<ThreadedClient> clientList) {
 			this.socket = socket;
-			this.reader = input;
-			this.outputStream = outputStream;
-			this.writer = new PrintWriter(this.outputStream);
+			this.reader = reader;
+			this.writer = writer;
 			this.clientList = clientList;
 		}
 
 		public void run() {
 			try {
-				Reader inputReader = new InputStreamReader(this.reader);
-				BufferedReader bufferedReader = new BufferedReader(inputReader);
 				while (true) {
-					this.getWriter().println("Enter Message: ");
-					this.getWriter().flush();
-					String inMessage = bufferedReader.readLine();
+					this.writer.println("Enter Message: ");
+					this.writer.flush();
+					String inMessage = this.reader.readLine();
+					System.out.println(inMessage);
 					for (ThreadedClient client : clientList) {
 						if (client != this) {
-							client.getWriter().println(inMessage);
-							client.getWriter().flush();
+							client.writer.println(inMessage);
+							client.writer.flush();
 						}
 					}
 				} 

@@ -19,7 +19,9 @@ class Client {
 			OutputStream clientOutputStream = clientSocket.getOutputStream();
 			PrintWriter clientWriter = new PrintWriter(clientOutputStream);
 			InputStream clientInputStream = clientSocket.getInputStream();
-			Thread clientReaderThread = new ClientReader(clientSocket, clientInputStream);
+			InputStreamReader streamReader = new InputStreamReader(clientInputStream);
+			BufferedReader reader = new BufferedReader(streamReader);
+			Thread clientReaderThread = new ClientReader(clientSocket, reader);
 			clientReaderThread.start();
 			while(true){
 				String outMessage = input.nextLine();
@@ -44,19 +46,17 @@ class Client {
 	public class ClientReader extends Thread {
 
 		Socket socket;
-		InputStream inputStream;
+		BufferedReader reader;
 
-		public ClientReader(Socket socket, InputStream inputStream) {
+		public ClientReader(Socket socket, BufferedReader reader) {
 			this.socket = socket;
-			this.inputStream = inputStream;
+			this.reader = reader;
 		}
 
 		public void run() {
 			try {
-				Reader clientReader = new InputStreamReader(this.inputStream);
-				BufferedReader bufferedReader = new BufferedReader(clientReader);
 				while (true) {
-					String inMessage = bufferedReader.readLine();
+					String inMessage = this.reader.readLine();
 					System.out.println(inMessage);
 				}
 			} catch(IOException except) {
