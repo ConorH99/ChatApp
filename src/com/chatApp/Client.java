@@ -8,7 +8,7 @@ class Client {
 	Socket clientSocket;
 	Scanner input = new Scanner(System.in);
 
-	public void clientConnect() {
+	public void clientConnectAndWrite() {
 
 		System.out.println("Welcome from the Client!");
 		String ip = "127.0.0.1";
@@ -17,17 +17,14 @@ class Client {
 		try {
 			clientSocket = new Socket(ip, port);
 			OutputStream clientOutputStream = clientSocket.getOutputStream();
-			InputStream clientInputStream = clientSocket.getInputStream();
 			PrintWriter clientWriter = new PrintWriter(clientOutputStream);
-			Reader clientReader = new InputStreamReader(clientInputStream);
-			BufferedReader bufferedReader = new BufferedReader(clientReader);
+			InputStream clientInputStream = clientSocket.getInputStream();
+			Thread clientReaderThread = new ClientReader(clientSocket, clientInputStream);
+			clientReaderThread.start();
 			while(true){
-				System.out.println(bufferedReader.readLine());
 				String outMessage = input.nextLine();
 				clientWriter.println(outMessage);
 				clientWriter.flush();
-				String inMessage = bufferedReader.readLine();
-				System.out.println(inMessage);
 			}
 
 			// clientSocket.close();
@@ -43,8 +40,33 @@ class Client {
 
 
 	}
+
+	public class ClientReader extends Thread {
+
+		Socket socket;
+		InputStream inputStream;
+
+		public ClientReader(Socket socket, InputStream inputStream) {
+			this.socket = socket;
+			this.inputStream = inputStream;
+		}
+
+		public void run() {
+			try {
+				Reader clientReader = new InputStreamReader(this.inputStream);
+				BufferedReader bufferedReader = new BufferedReader(clientReader);
+				while (true) {
+					String inMessage = bufferedReader.readLine();
+					System.out.println(inMessage);
+				}
+			} catch(IOException except) {
+				except.printStackTrace();				
+			}
+		}
+	}
+
 	public static void main(String[] args) {
 		Client client = new Client();
-		client.clientConnect();
+		client.clientConnectAndWrite();
 	}
 }
