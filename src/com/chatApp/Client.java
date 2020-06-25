@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 class Client {
+	UserInterface ui = new UserInterface();
 	Socket clientSocket;
 	Scanner input = new Scanner(System.in);
 	OutputStream clientOutputStream;
@@ -15,34 +16,15 @@ class Client {
 	InputStream clientInputStream;
 	InputStreamReader streamReader;
 	BufferedReader reader;
-	JFrame frame;
-	JPanel mainArea;
-	JTextArea messageArea;
-	JTextField outgoingMessage;
-	JButton button;
+	
 
 	public static void main(String[] args) {
 		Client client = new Client();
-		client.drawGui();
 		client.clientConnectAndWrite();
 	}
 
-	public void drawGui() {
-		frame = new JFrame();
-		mainArea = new JPanel();
-		messageArea = new JTextArea(15, 30);
-		outgoingMessage = new JTextField(10);
-		button = new JButton("Send");
-		button.addActionListener(new SendEvent());
-		messageArea.setEditable(false);
-		mainArea.add(messageArea);
-		mainArea.add(outgoingMessage);
-		mainArea.add(button);
-		frame.getContentPane().add(mainArea, BorderLayout.CENTER);
-		frame.setSize(400, 400);
-		frame.setResizable(false);
-		frame.setVisible(true);
-	}
+
+	//Client Write Thread
 
 	public void clientConnectAndWrite() {
 
@@ -51,6 +33,7 @@ class Client {
 		int port = 3000;
 
 		try {
+			ui.drawGui();
 			clientSocket = new Socket(ip, port);
 			clientOutputStream = clientSocket.getOutputStream();
 			clientWriter = new PrintWriter(clientOutputStream);
@@ -67,6 +50,8 @@ class Client {
 
 	}
 
+	//CLient Read thread
+
 	public class ClientReader extends Thread {
 
 		Socket socket;
@@ -82,7 +67,7 @@ class Client {
 				while (true) {
 					String inMessage = this.reader.readLine();
 					System.out.println(inMessage);
-					messageArea.append("Client: " + inMessage + "\n");
+					ui.messageArea.append("Client: " + inMessage + "\n");
 				}
 			} catch(IOException except) {
 				except.printStackTrace();				
@@ -90,15 +75,41 @@ class Client {
 		}
 	}
 
+	public class UserInterface {
+
+		JFrame frame;
+		JPanel mainArea;
+		JTextArea messageArea;
+		JTextField outgoingMessage;
+		JButton button;
+
+		public void drawGui() {
+			frame = new JFrame();
+			mainArea = new JPanel();
+			messageArea = new JTextArea(15, 30);
+			outgoingMessage = new JTextField(10);
+			button = new JButton("Send");
+			button.addActionListener(new SendEvent());
+			messageArea.setEditable(false);
+			mainArea.add(messageArea);
+			mainArea.add(outgoingMessage);
+			mainArea.add(button);
+			frame.getContentPane().add(mainArea, BorderLayout.CENTER);
+			frame.setSize(400, 400);
+			frame.setResizable(false);
+			frame.setVisible(true);
+		}
+	}
+
 	public class SendEvent implements ActionListener {
 
 		public void actionPerformed(ActionEvent event) {
 			try {
-				String message = outgoingMessage.getText();
+				String message = ui.outgoingMessage.getText();
 				clientWriter.println(message);
 				clientWriter.flush();
-				messageArea.append("Me: " + message + "\n");
-				outgoingMessage.setText("");
+				ui.messageArea.append("Me: " + message + "\n");
+				ui.outgoingMessage.setText("");
 			} catch (Exception except) {
 
 			}
