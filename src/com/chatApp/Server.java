@@ -39,10 +39,6 @@ public class Server {
 				clientThread.start();
 			}
 
-			// serverSocket.close();
-			// serverInputStream.close();
-			// serverOutputStream.close();
-
 		} catch (IOException except) {
 			except.printStackTrace();
 		}
@@ -65,9 +61,11 @@ public class Server {
 		public void run() {
 			try {
 				while (true) {
-					this.writer.println("Enter Message: ");
-					this.writer.flush();
 					String inMessage = this.reader.readLine();
+					if (inMessage.equals("Quit")) {
+						break;
+					}
+
 					System.out.println(inMessage);
 					for (ThreadedClient client : clientList) {
 						if (client != this) {
@@ -75,14 +73,7 @@ public class Server {
 							client.writer.flush();
 						}
 					}
-				} 
-
-				// this.socket.close();
-				// this.reader.close();
-				// this.writer.close();
-				// inputReader.close();
-				// bufferedReader.close();
-				// outputWriter.close();
+				}
 
 			} catch (IOException except) {
 					except.printStackTrace();

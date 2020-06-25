@@ -3,10 +3,46 @@ package com.chatApp;
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 class Client {
 	Socket clientSocket;
 	Scanner input = new Scanner(System.in);
+	OutputStream clientOutputStream;
+	PrintWriter clientWriter;
+	InputStream clientInputStream;
+	InputStreamReader streamReader;
+	BufferedReader reader;
+	JFrame frame;
+	JPanel mainArea;
+	JTextArea messageArea;
+	JTextField outgoingMessage;
+	JButton button;
+
+	public static void main(String[] args) {
+		Client client = new Client();
+		client.drawGui();
+		client.clientConnectAndWrite();
+	}
+
+	public void drawGui() {
+		frame = new JFrame();
+		mainArea = new JPanel();
+		messageArea = new JTextArea(15, 30);
+		outgoingMessage = new JTextField(10);
+		button = new JButton("Send");
+		button.addActionListener(new SendEvent());
+		messageArea.setEditable(false);
+		mainArea.add(messageArea);
+		mainArea.add(outgoingMessage);
+		mainArea.add(button);
+		frame.getContentPane().add(mainArea, BorderLayout.CENTER);
+		frame.setSize(400, 400);
+		frame.setResizable(false);
+		frame.setVisible(true);
+	}
 
 	public void clientConnectAndWrite() {
 
@@ -16,25 +52,13 @@ class Client {
 
 		try {
 			clientSocket = new Socket(ip, port);
-			OutputStream clientOutputStream = clientSocket.getOutputStream();
-			PrintWriter clientWriter = new PrintWriter(clientOutputStream);
-			InputStream clientInputStream = clientSocket.getInputStream();
-			InputStreamReader streamReader = new InputStreamReader(clientInputStream);
-			BufferedReader reader = new BufferedReader(streamReader);
+			clientOutputStream = clientSocket.getOutputStream();
+			clientWriter = new PrintWriter(clientOutputStream);
+			clientInputStream = clientSocket.getInputStream();
+			streamReader = new InputStreamReader(clientInputStream);
+			reader = new BufferedReader(streamReader);
 			Thread clientReaderThread = new ClientReader(clientSocket, reader);
 			clientReaderThread.start();
-			while(true){
-				String outMessage = input.nextLine();
-				clientWriter.println(outMessage);
-				clientWriter.flush();
-			}
-
-			// clientSocket.close();
-			// clientOutputStream.close();
-			// clientInputStream.close();
-			// clientWriter.close();
-			// clientReader.close();
-			// bufferedReader.close();
 			
 		} catch(IOException except) {
 			except.printStackTrace();
@@ -58,6 +82,7 @@ class Client {
 				while (true) {
 					String inMessage = this.reader.readLine();
 					System.out.println(inMessage);
+					messageArea.append(inMessage + "\n");
 				}
 			} catch(IOException except) {
 				except.printStackTrace();				
@@ -65,8 +90,15 @@ class Client {
 		}
 	}
 
-	public static void main(String[] args) {
-		Client client = new Client();
-		client.clientConnectAndWrite();
+	public class SendEvent implements ActionListener {
+
+		public void actionPerformed(ActionEvent event) {
+			try {
+				clientWriter.println(outgoingMessage.getText());
+				clientWriter.flush();
+			} catch (Exception except) {
+
+			}
+		}
 	}
 }
