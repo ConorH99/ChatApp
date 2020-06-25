@@ -82,7 +82,7 @@ class Client {
 				while (true) {
 					String inMessage = this.reader.readLine();
 					System.out.println(inMessage);
-					messageArea.append(inMessage + "\n");
+					messageArea.append("Client: " + inMessage + "\n");
 				}
 			} catch(IOException except) {
 				except.printStackTrace();				
@@ -94,8 +94,11 @@ class Client {
 
 		public void actionPerformed(ActionEvent event) {
 			try {
-				clientWriter.println(outgoingMessage.getText());
+				String message = outgoingMessage.getText();
+				clientWriter.println(message);
 				clientWriter.flush();
+				messageArea.append("Me: " + message + "\n");
+				outgoingMessage.setText("");
 			} catch (Exception except) {
 
 			}
