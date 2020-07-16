@@ -6,14 +6,16 @@ import java.util.*;
 
 public class Server {
 
+
+	final String CLIENT_DISCONNECT_MESSAGE = "FIN";
+	final String SERVER_ACK_MESSAGE = "ACK";
 	int port = 3000;
 	ServerSocket serverSocket;
 	Socket clientSocket;
+	BufferedReader serverReader;
+	PrintWriter serverWriter;
 	String clientIP;
-
-	public void run() {
-
-	}
+	ThreadedClient clientThread;
 
 	public void serverConnect() {
 
@@ -28,13 +30,10 @@ public class Server {
 			while (true) {
 				clientSocket = serverSocket.accept();
 				clientIP = clientSocket.getRemoteSocketAddress().toString();
-				InputStream serverInputStream = clientSocket.getInputStream();
-				InputStreamReader in = new InputStreamReader(serverInputStream);
-				BufferedReader bufferedReader = new BufferedReader(in);
-				OutputStream serverOutputStream = clientSocket.getOutputStream();
-				PrintWriter writer = new PrintWriter(serverOutputStream);
+				serverReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+				serverWriter = new PrintWriter(clientSocket.getOutputStream());
 				System.out.println("Connection from address " + clientIP);
-				ThreadedClient clientThread = new ThreadedClient(clientSocket, bufferedReader, writer, clientList);
+				clientThread = new ThreadedClient(clientSocket, serverReader, serverWriter, clientList);
 				clientList.add(clientThread);
 				clientThread.start();
 			}
@@ -59,14 +58,30 @@ public class Server {
 		}
 
 		public void run() {
+			checkForRead();
+		}
+
+		public void disconnect() {
+			try {
+				this.writer.println(SERVER_ACK_MESSAGE);
+				this.writer.flush();
+				this.clientList.remove(this);
+				this.writer.close();
+				this.socket.close();
+				System.out.println("Disconnected");
+			} catch (IOException exception) {
+
+			}
+		}
+
+		public void checkForRead() {
 			try {
 				while (true) {
 					String inMessage = this.reader.readLine();
-					if (inMessage.equals("Quit")) {
+					if (inMessage.equals(CLIENT_DISCONNECT_MESSAGE)) {
+						disconnect();
 						break;
 					}
-
-					System.out.println(inMessage);
 					for (ThreadedClient client : clientList) {
 						if (client != this) {
 							client.writer.println(inMessage);
@@ -74,13 +89,9 @@ public class Server {
 						}
 					}
 				}
-
 			} catch (IOException except) {
 					except.printStackTrace();
 				}
-		}
-		public PrintWriter getWriter() {
-			return this.writer;
 		}
 	}
 
