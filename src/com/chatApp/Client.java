@@ -13,6 +13,7 @@ class Client {
 	final String CLIENT_DISCONNECT_MESSAGE = "FIN";
 	final String SERVER_ACK_MESSAGE = "ACK";
 	Scanner input = new Scanner(System.in);
+	String name;
 	Socket clientSocket;
 	PrintWriter clientWriter;
 	BufferedReader clientReader;
@@ -32,7 +33,15 @@ class Client {
 		client.clientConnect();
 	}
 
-	//Client Write Thread
+	public Client() {
+		this.name = getNameInput();
+	}
+
+	public String getNameInput() {
+		System.out.println("Please Enter Your Name: ");
+		String name = input.nextLine();
+		return name;
+	}
 
 	public void clientConnect() {
 
@@ -94,7 +103,7 @@ class Client {
 			try {
 				this.reader.close();
 				this.socket.close();
-				messageArea.append("You are disconnected\n");
+				frame.dispose();
 				System.out.println("Socket Closed..");
 			} catch(IOException exception) {
 
