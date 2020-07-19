@@ -18,6 +18,7 @@ class Client {
 	PrintWriter clientWriter;
 	BufferedReader clientReader;
 	ClientReader clientReaderThread;
+	String clientName;
 
 	//GUI Variables
 	JFrame frame;
@@ -54,6 +55,8 @@ class Client {
 			clientSocket = new Socket(ip, port);
 			clientWriter = new PrintWriter(clientSocket.getOutputStream());
 			clientReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			clientWriter.println(this.name);
+			clientWriter.flush();
 			clientReaderThread = new ClientReader(clientSocket, clientReader);
 			clientReaderThread.start();
 			
@@ -118,7 +121,7 @@ class Client {
 						disconnect();
 						break;
 					}
-					messageArea.append("Client: " + inMessage + "\n");
+					messageArea.append(inMessage + "\n");
 				}
 			} catch(IOException except) {
 				except.printStackTrace();	

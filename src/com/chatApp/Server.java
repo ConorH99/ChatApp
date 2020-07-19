@@ -16,6 +16,7 @@ public class Server {
 	PrintWriter serverWriter;
 	String clientIP;
 	ThreadedClient clientThread;
+	String clientName;
 
 	public void serverConnect() {
 
@@ -32,8 +33,10 @@ public class Server {
 				clientIP = clientSocket.getRemoteSocketAddress().toString();
 				serverReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				serverWriter = new PrintWriter(clientSocket.getOutputStream());
+				clientName = serverReader.readLine();
 				System.out.println("Connection from address " + clientIP);
-				clientThread = new ThreadedClient(clientSocket, serverReader, serverWriter, clientList);
+				System.out.println("User's name is " + clientName);
+				clientThread = new ThreadedClient(clientName, clientSocket, serverReader, serverWriter, clientList);
 				clientList.add(clientThread);
 				clientThread.start();
 			}
@@ -49,8 +52,10 @@ public class Server {
 		BufferedReader reader;
 		PrintWriter writer;
 		ArrayList<ThreadedClient> clientList;
+		String name;
 
-		public ThreadedClient(Socket socket, BufferedReader reader, PrintWriter writer, ArrayList<ThreadedClient> clientList) {
+		public ThreadedClient(String name, Socket socket, BufferedReader reader, PrintWriter writer, ArrayList<ThreadedClient> clientList) {
+			this.name = name;
 			this.socket = socket;
 			this.reader = reader;
 			this.writer = writer;
@@ -84,7 +89,7 @@ public class Server {
 					}
 					for (ThreadedClient client : clientList) {
 						if (client != this) {
-							client.writer.println(inMessage);
+							client.writer.println(this.getClientName() + ": " + inMessage);
 							client.writer.flush();
 						}
 					}
@@ -92,6 +97,10 @@ public class Server {
 			} catch (IOException except) {
 					except.printStackTrace();
 				}
+		}
+
+		public String getClientName() {
+			return this.name;
 		}
 	}
 
