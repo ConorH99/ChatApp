@@ -65,7 +65,7 @@ class Client {
 		}
 	}
 
-	public void drawGui() {
+	public void drawChatGui() {
 		frame = new JFrame();
 		mainArea = new JPanel();
 		messageArea = new JTextArea(15, 30);
@@ -109,7 +109,7 @@ class Client {
 				frame.dispose();
 				System.out.println("Socket Closed..");
 			} catch(IOException exception) {
-
+				exception.printStackTrace();
 			}
 		}
 
@@ -123,8 +123,8 @@ class Client {
 					}
 					messageArea.append(inMessage + "\n");
 				}
-			} catch(IOException except) {
-				except.printStackTrace();	
+			} catch(IOException exception) {
+				exception.printStackTrace();	
 			}
 		}
 	}
@@ -138,8 +138,8 @@ class Client {
 				clientWriter.flush();
 				messageArea.append("Me: " + message + "\n");
 				outgoingMessage.setText("");
-			} catch (Exception except) {
-
+			} catch (Exception exception) {
+				exception.printStackTrace();
 			}
 		}
 	}

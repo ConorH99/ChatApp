@@ -37,11 +37,15 @@ public class Server {
 				System.out.println("Connection from address " + clientIP);
 				System.out.println("User's name is " + clientName);
 				clientThread = new ThreadedClient(clientName, clientSocket, serverReader, serverWriter, clientList);
+				for (ThreadedClient client : clientList) {
+					client.writer.println(clientName + " has joined the chat");
+					client.writer.flush();
+				}
 				clientList.add(clientThread);
 				clientThread.start();
 			}
 
-		} catch (IOException except) {
+		} catch (IOException exception) {
 			except.printStackTrace();
 		}
 	}
@@ -71,11 +75,14 @@ public class Server {
 				this.writer.println(SERVER_ACK_MESSAGE);
 				this.writer.flush();
 				this.clientList.remove(this);
+				for (ThreadedClient client : this.clientList) {
+					client.writer.println(getClientName() + " has left the chat");
+					client.writer.flush();
+				}
 				this.writer.close();
 				this.socket.close();
-				System.out.println("Disconnected");
 			} catch (IOException exception) {
-
+				exception.printStackTrace();
 			}
 		}
 
@@ -87,15 +94,15 @@ public class Server {
 						disconnect();
 						break;
 					}
-					for (ThreadedClient client : clientList) {
+					for (ThreadedClient client : this.clientList) {
 						if (client != this) {
 							client.writer.println(this.getClientName() + ": " + inMessage);
 							client.writer.flush();
 						}
 					}
 				}
-			} catch (IOException except) {
-					except.printStackTrace();
+			} catch (IOException exception) {
+					exception.printStackTrace();
 				}
 		}
 
