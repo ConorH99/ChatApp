@@ -3,15 +3,12 @@ package com.chatApp;
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
 
 class Client {
 
-	//Socket Variables
 	final String CLIENT_DISCONNECT_MESSAGE = "FIN";
 	final String SERVER_ACK_MESSAGE = "ACK";
+	ChatView view;
 	Scanner input = new Scanner(System.in);
 	String name;
 	Socket clientSocket;
@@ -20,22 +17,19 @@ class Client {
 	ClientReader clientReaderThread;
 	String clientName;
 
-	//GUI Variables
-	JFrame frame;
-	JPanel mainArea;
-	JTextArea messageArea;
-	JTextField outgoingMessage;
-	JButton sendButton;
-	JButton disconnectButton;
-	
-
 	public static void main(String[] args) {
 		Client client = new Client();
+		client.drawGui();
 		client.clientConnect();
 	}
 
 	public Client() {
 		this.name = getNameInput();
+		this.view = new ChatView(this);
+	}
+
+	public void drawGui() {
+		this.view.drawGui();
 	}
 
 	public String getNameInput() {
@@ -49,7 +43,6 @@ class Client {
 		System.out.println("Welcome from the Client!");
 		String ip = "127.0.0.1";
 		int port = 3000;
-		drawGui();
 
 		try {
 			clientSocket = new Socket(ip, port);
@@ -63,26 +56,6 @@ class Client {
 		} catch(IOException except) {
 			except.printStackTrace();
 		}
-	}
-
-	public void drawChatGui() {
-		frame = new JFrame();
-		mainArea = new JPanel();
-		messageArea = new JTextArea(15, 30);
-		outgoingMessage = new JTextField(10);
-		sendButton = new JButton("Send");
-		sendButton.addActionListener(new SendEvent());
-		disconnectButton = new JButton("Disconnect");
-		disconnectButton.addActionListener(new DisconnectEvent());
-		messageArea.setEditable(false);
-		mainArea.add(messageArea);
-		mainArea.add(outgoingMessage);
-		mainArea.add(sendButton);
-		mainArea.add(disconnectButton);
-		frame.getContentPane().add(mainArea, BorderLayout.CENTER);
-		frame.setSize(400, 400);
-		frame.setResizable(false);
-		frame.setVisible(true);
 	}
 
 	//CLient Read thread
@@ -102,17 +75,6 @@ class Client {
 			checkForRead();
 		}
 
-		public void disconnect() {
-			try {
-				this.reader.close();
-				this.socket.close();
-				frame.dispose();
-				System.out.println("Socket Closed..");
-			} catch(IOException exception) {
-				exception.printStackTrace();
-			}
-		}
-
 		public void checkForRead() {
 			try {
 				while (true) {
@@ -121,34 +83,22 @@ class Client {
 						disconnect();
 						break;
 					}
-					messageArea.append(inMessage + "\n");
+					view.messageArea.append(inMessage + "\n");
 				}
 			} catch(IOException exception) {
 				exception.printStackTrace();	
 			}
 		}
-	}
 
-	public class SendEvent implements ActionListener {
-
-		public void actionPerformed(ActionEvent event) {
+		public void disconnect() {
 			try {
-				String message = outgoingMessage.getText();
-				clientWriter.println(message);
-				clientWriter.flush();
-				messageArea.append("Me: " + message + "\n");
-				outgoingMessage.setText("");
-			} catch (Exception exception) {
+				this.reader.close();
+				this.socket.close();
+				view.frame.dispose();
+				System.out.println("Socket Closed..");
+			} catch(IOException exception) {
 				exception.printStackTrace();
 			}
-		}
-	}
-
-	public class DisconnectEvent implements ActionListener {
-
-		public void actionPerformed(ActionEvent event) {
-			clientWriter.println(CLIENT_DISCONNECT_MESSAGE);
-			clientWriter.flush();
 		}
 	}
 }
