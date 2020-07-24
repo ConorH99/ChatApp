@@ -8,7 +8,7 @@ class Client {
 
 	final String CLIENT_DISCONNECT_MESSAGE = "FIN";
 	final String SERVER_ACK_MESSAGE = "ACK";
-	ChatView view;
+	ChatView mainView;
 	Scanner input = new Scanner(System.in);
 	String name;
 	Socket clientSocket;
@@ -19,23 +19,17 @@ class Client {
 
 	public static void main(String[] args) {
 		Client client = new Client();
-		client.drawGui();
-		client.clientConnect();
+		NameInput nameInput = new NameInput(client);
+		nameInput.drawNameGui();
+
 	}
 
 	public Client() {
-		this.name = getNameInput();
-		this.view = new ChatView(this);
-	}
+		this.name = null;
+		this.mainView = new ChatView(this);	}
 
 	public void drawGui() {
-		this.view.drawGui();
-	}
-
-	public String getNameInput() {
-		System.out.println("Please Enter Your Name: ");
-		String name = input.nextLine();
-		return name;
+		this.mainView.drawGui();
 	}
 
 	public void clientConnect() {
@@ -56,6 +50,12 @@ class Client {
 		} catch(IOException except) {
 			except.printStackTrace();
 		}
+	}
+
+	public String setName(String name) {
+		this.name = name;
+		System.out.println(this.name);
+		return this.name;
 	}
 
 	//CLient Read thread
@@ -83,7 +83,7 @@ class Client {
 						disconnect();
 						break;
 					}
-					view.messageArea.append(inMessage + "\n");
+					mainView.messageArea.append(inMessage + "\n");
 				}
 			} catch(IOException exception) {
 				exception.printStackTrace();	
@@ -94,7 +94,7 @@ class Client {
 			try {
 				this.reader.close();
 				this.socket.close();
-				view.frame.dispose();
+				mainView.frame.dispose();
 				System.out.println("Socket Closed..");
 			} catch(IOException exception) {
 				exception.printStackTrace();

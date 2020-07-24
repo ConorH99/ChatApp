@@ -7,7 +7,6 @@ import java.awt.event.*;
 public class ChatView {
 
 	Client model;
-
 	JFrame frame;
 	JPanel mainArea;
 	JTextArea messageArea;
