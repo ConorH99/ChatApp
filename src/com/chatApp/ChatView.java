@@ -4,10 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ChatView {
+public class ChatView extends JFrame {
 
 	Client model;
-	JFrame frame;
 	JPanel mainArea;
 	JTextArea messageArea;
 	JTextField outgoingMessage;
@@ -19,7 +18,6 @@ public class ChatView {
 	}
 
 	public void drawGui() {
-		frame = new JFrame();
 		mainArea = new JPanel();
 		messageArea = new JTextArea(15, 30);
 		outgoingMessage = new JTextField(10);
@@ -32,10 +30,16 @@ public class ChatView {
 		mainArea.add(outgoingMessage);
 		mainArea.add(sendButton);
 		mainArea.add(disconnectButton);
-		frame.getContentPane().add(mainArea, BorderLayout.CENTER);
-		frame.setSize(400, 400);
-		frame.setResizable(false);
-		frame.setVisible(true);
+		addWindowListener(new WindowClose());
+		getContentPane().add(mainArea, BorderLayout.CENTER);
+		setSize(400, 400);
+		setResizable(false);
+		setVisible(true);
+	}
+
+	public void beginDisconnect() {
+		model.clientWriter.println(model.CLIENT_DISCONNECT_MESSAGE);
+		model.clientWriter.flush();
 	}
 
 	public class SendEvent implements ActionListener {
@@ -56,8 +60,15 @@ public class ChatView {
 	public class DisconnectEvent implements ActionListener {
 
 		public void actionPerformed(ActionEvent event) {
-			model.clientWriter.println(model.CLIENT_DISCONNECT_MESSAGE);
-			model.clientWriter.flush();
+			beginDisconnect();
+		}
+	}
+
+	public class WindowClose extends WindowAdapter {
+
+		public void windowClosing(WindowEvent event) {
+			System.out.println("dddd");
+			beginDisconnect();
 		}
 	}
 

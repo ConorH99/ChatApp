@@ -19,20 +19,31 @@ class Client {
 
 	public static void main(String[] args) {
 		Client client = new Client();
-		NameInput nameInput = new NameInput(client);
-		nameInput.drawNameGui();
+		client.drawNameGui();
 
 	}
 
 	public Client() {
 		this.name = null;
-		this.mainView = new ChatView(this);	}
+		this.mainView = new ChatView(this);	
+		new NameInput(this);
+	}
+
+	public void drawNameGui() {
+		NameInput nameInput = new NameInput(this);
+		nameInput.drawNameGui();
+	}
+
+	public void startConnection() {
+		drawGui();
+		connect();
+	}
 
 	public void drawGui() {
 		this.mainView.drawGui();
 	}
 
-	public void clientConnect() {
+	public void connect() {
 
 		System.out.println("Welcome from the Client!");
 		String ip = "127.0.0.1";
@@ -54,7 +65,6 @@ class Client {
 
 	public String setName(String name) {
 		this.name = name;
-		System.out.println(this.name);
 		return this.name;
 	}
 
@@ -94,7 +104,7 @@ class Client {
 			try {
 				this.reader.close();
 				this.socket.close();
-				mainView.frame.dispose();
+				mainView.dispose();
 				System.out.println("Socket Closed..");
 			} catch(IOException exception) {
 				exception.printStackTrace();
