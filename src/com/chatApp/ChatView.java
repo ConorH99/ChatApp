@@ -9,6 +9,7 @@ public class ChatView extends JFrame {
 	Client model;
 	JPanel mainArea;
 	JTextArea messageArea;
+	JScrollPane scrollBar;
 	JTextField outgoingMessage;
 	JButton sendButton;
 	JButton disconnectButton;
@@ -20,18 +21,20 @@ public class ChatView extends JFrame {
 	public void drawGui() {
 		mainArea = new JPanel();
 		messageArea = new JTextArea(15, 30);
+		scrollableMessageArea = new JScrollPane(messageArea);
+		scrollableMessageArea.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);    
 		outgoingMessage = new JTextField(10);
 		sendButton = new JButton("Send");
 		sendButton.addActionListener(new SendEvent());
 		disconnectButton = new JButton("Disconnect");
 		disconnectButton.addActionListener(new DisconnectEvent());
 		messageArea.setEditable(false);
-		mainArea.add(messageArea);
+		mainArea.add(scrollableMessageArea);
 		mainArea.add(outgoingMessage);
 		mainArea.add(sendButton);
 		mainArea.add(disconnectButton);
 		addWindowListener(new WindowClose());
-		getContentPane().add(mainArea, BorderLayout.CENTER);
+		getContentPane().add(mainArea);
 		setSize(400, 400);
 		setResizable(false);
 		setVisible(true);
@@ -67,7 +70,6 @@ public class ChatView extends JFrame {
 	public class WindowClose extends WindowAdapter {
 
 		public void windowClosing(WindowEvent event) {
-			System.out.println("dddd");
 			beginDisconnect();
 		}
 	}

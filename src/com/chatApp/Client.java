@@ -45,7 +45,7 @@ class Client {
 
 	public void connect() {
 
-		System.out.println("Welcome from the Client!");
+		System.out.println("Welcome " + this.name);
 		String ip = "127.0.0.1";
 		int port = 3000;
 

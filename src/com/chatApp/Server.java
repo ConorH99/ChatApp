@@ -30,12 +30,10 @@ public class Server {
 
 			while (true) {
 				clientSocket = serverSocket.accept();
-				clientIP = clientSocket.getRemoteSocketAddress().toString();
 				serverReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				serverWriter = new PrintWriter(clientSocket.getOutputStream());
 				clientName = serverReader.readLine();
-				System.out.println("Connection from address " + clientIP);
-				System.out.println("User's name is " + clientName);
+				System.out.println("Connection from " + clientName);
 				clientThread = new ThreadedClient(clientName, clientSocket, serverReader, serverWriter, clientList);
 				for (ThreadedClient client : clientList) {
 					client.writer.println(clientName + " has joined the chat");
