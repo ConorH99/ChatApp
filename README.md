@@ -6,7 +6,7 @@ This is a simple chat app written in java.
 
 ## Usage
 
-To run the program, clone the repository and cd into the src directory. Run the command (javac com.chatApp.*.java) to compile all files. Then run the command (java com.chatApp.Server) and (java com.chatApp.Client).  Run Server and Client in seperate terminals
+To run the program, clone the repository and cd into the src directory. Run the command *javac com.chatApp.*.java* to compile all files. Then run the command *java com.chatApp.Server* and *java com.chatApp.Client*.  Run Server and Client in seperate terminals
 
 Run the server first and then run the client.
 
