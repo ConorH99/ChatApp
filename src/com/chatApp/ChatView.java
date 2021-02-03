@@ -13,6 +13,7 @@ public class ChatView extends JFrame {
 	JTextField outgoingMessage;
 	JButton sendButton;
 	JButton disconnectButton;
+	JScrollPane scrollableMessageArea;
 
 	public ChatView(Client model) {
 		this.model = model;
