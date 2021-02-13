@@ -42,8 +42,7 @@ public class ChatView extends JFrame {
 	}
 
 	public void beginDisconnect() {
-		model.clientWriter.println(model.CLIENT_DISCONNECT_MESSAGE);
-		model.clientWriter.flush();
+		this.model.beginDisconnect();
 	}
 
 	public class SendEvent implements ActionListener {

@@ -17,16 +17,14 @@ class Client {
 	ClientReader clientReaderThread;
 	String clientName;
 
-	public static void main(String[] args) {
-		Client client = new Client();
-		client.drawNameGui();
-
-	}
-
 	public Client() {
 		this.name = null;
 		this.mainView = new ChatView(this);	
-		new NameInput(this);
+	}
+
+	public static void main(String[] args) {
+		Client client = new Client();
+		client.drawNameGui();
 	}
 
 	public void drawNameGui() {
@@ -61,6 +59,11 @@ class Client {
 		} catch(IOException except) {
 			except.printStackTrace();
 		}
+	}
+
+	public void beginDisconnect() {
+		clientWriter.println(CLIENT_DISCONNECT_MESSAGE);
+		clientWriter.flush();
 	}
 
 	public String setName(String name) {
